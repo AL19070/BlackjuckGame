@@ -50,17 +50,6 @@ def kakekin_set():
             print("正の数を入力してください")
             continue
 
-#変数の初期化
-def all_init():
-    global playerBurst,dealerBurst,state
-    playerCard.clear()
-    dealerCard.clear()
-    cardList.clear()
-    cardList.extend(CARDS)
-    playerBurst = False
-    dealerBurst = False
-    state = 1
-
 #山札のシャッフル
 def cardList_shuffle():
     random.shuffle(cardList)
@@ -73,29 +62,30 @@ def draw_playerCard():
 def draw_dealerCard():
     dealerCard.append(cardList.pop(0))
 
-#両者カードを2枚引く
-def first_draw():
-    for i in range(2):
-        draw_playerCard()
-        draw_dealerCard()
-
 #手札の得点を計算する
 def calculate_point(hand):
-    numberList = []
     numberListInt = []
+    AceCount = 0
+
+    #カードナンバーの判定
     for i in range(len(hand)):
         cardNumber = hand[i].split("-")[-1]
-        numberList.append(cardNumber)
         if cardNumber == "A":
             numberListInt.append(11)
+            AceCount += 1
         elif cardNumber == "J" or cardNumber == "Q" or cardNumber == "K":
             numberListInt.append(10)
         else:
             numberListInt.append(int(cardNumber))
         
     point = sum(numberListInt)
-    if point > BLACKJUCK and "A" in numberList:
-        point -= 10
+    
+    #エースのカードがある時の処理
+    for i in range(AceCount):
+        if point > BLACKJUCK:
+            point -= 10
+            if point <= BLACKJUCK:
+                break 
     return point
 
 #ディーラ・プレイヤの手札の状況を出力
@@ -110,19 +100,19 @@ def print_situation():
     print(f"得点：{calculate_point(playerCard)}")
     print("-" * SEPARATOR_NUM)
 
-#ディーラの動き
-def dealer_ai():
+#ディーラの処理
+def dealer_choice():
     global dealerBurst
     dealerPoint = calculate_point(dealerCard)
     if dealerPoint <= DEALER_PARAMETER:
         draw_dealerCard()
-        dealer_ai()
+        dealer_choice()
     elif dealerPoint > BLACKJUCK:
         print("ディーラの得点がバーストしました．")
         dealerBurst = True
 
 #プレイヤによる勝負するのか、ドローするかの選択
-def command_choice():
+def player_choice():
     global playerBurst
     while True:
         try:
@@ -207,13 +197,26 @@ def continue_choice():
 #1ゲーム
 def play_game():
     kakekin_set()
-    all_init()
+
+    #変数の初期化
+    playerCard.clear()
+    dealerCard.clear()
+    cardList.clear()
+    cardList.extend(CARDS)
+    playerBurst = False
+    dealerBurst = False
+    state = 1
     cardList_shuffle()
-    first_draw()
+
+    #両者ともにカードを2枚引く
+    for i in range(2):
+        draw_playerCard()
+        draw_dealerCard()
+    
     print_situation()
-    command_choice()
+    player_choice()
     if playerBurst == False:
-        dealer_ai()
+        dealer_choice()
     print_result()
 
 #メイン処理
