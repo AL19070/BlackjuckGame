@@ -4,14 +4,14 @@ CARDS = [
     "H-A", "H-2", "H-3", "H-4", "H-5", "H-6", "H-7", "H-8", "H-9", "H-10", "H-J", "H-Q", "H-K",
     "S-A", "S-2", "S-3", "S-4", "S-5", "S-6", "S-7", "S-8", "S-9", "S-10", "S-J", "S-Q", "S-K",
     "D-A", "D-2", "D-3", "D-4", "D-5", "D-6", "D-7", "D-8", "D-9", "D-10", "D-J", "D-Q", "D-K",
-    "C-A", "C-2", "C-3", "C-4", "C-5", "C-6", "C-7", "C-8", "C-9", "C-10", "C-J", "C-Q", "C-K", 
+    "C-A", "C-2", "C-3", "C-4", "C-5", "C-6", "C-7", "C-8", "C-9", "C-10", "C-J", "C-Q", "C-K" 
 ]
 BLACKJUCK = 21          
 DEALER_PARAMETER = 16   #ディーラの行動パラメータ
 SEPARATOR_NUM = 70      #仕切り記号の数
    
 cardList = []           # 山札
-playerCard = []         # プレイヤの手札
+playerCard = []         # プレイヤーの手札
 dealerCard = []         # ディーラの手札
 state = 1               # 1:ゲーム続行/ 2:ゲーム終了
 motikin = 0   
@@ -25,7 +25,7 @@ def motikin_set():
     while True:
         try:
             
-            motikin = int(input("プレイヤの持ち金を入力(正の数)してください："))
+            motikin = int(input("プレイヤーの持ち金を入力(正の数)してください："))
             if motikin > 0:
                 break
             else:
@@ -54,7 +54,7 @@ def kakekin_set():
 def cardList_shuffle():
     random.shuffle(cardList)
 
-#プレイヤが1枚引く
+#プレイヤーが1枚引く
 def draw_playerCard():
     playerCard.append(cardList.pop(0))
 
@@ -88,14 +88,14 @@ def calculate_point(hand):
                 break 
     return point
 
-#ディーラ・プレイヤの手札の状況を出力
+#ディーラ・プレイヤーの手札の状況を出力
 def print_situation():
     print("")
     print("-" * SEPARATOR_NUM)
     print("ディーラ")
     print(f"手札：{len(dealerCard)}枚")
     print("-" * SEPARATOR_NUM)
-    print("プレイヤ")
+    print("プレイヤー")
     print(f"手札：{playerCard}")
     print(f"得点：{calculate_point(playerCard)}")
     print("-" * SEPARATOR_NUM)
@@ -103,6 +103,7 @@ def print_situation():
 #ディーラの処理
 def dealer_choice():
     global dealerBurst
+    dealerBurst = False
     dealerPoint = calculate_point(dealerCard)
     if dealerPoint <= DEALER_PARAMETER:
         draw_dealerCard()
@@ -111,9 +112,10 @@ def dealer_choice():
         print("ディーラの得点がバーストしました．")
         dealerBurst = True
 
-#プレイヤによる勝負するのか、ドローするかの選択
+#プレイヤーによる「勝負するのか、ドローするか」の選択
 def player_choice():
     global playerBurst
+    playerBurst = False
     while True:
         try:
             if calculate_point(playerCard) <= BLACKJUCK:
@@ -128,7 +130,7 @@ def player_choice():
                     print("指定の数を入力してください")
                     continue
             else:
-                print("プレイヤの得点がバーストしました．")
+                print("プレイヤーの得点がバーストしました．")
                 playerBurst = True
                 break
         except ValueError:
@@ -147,16 +149,16 @@ def print_result():
         print("結果:引き分け")
     elif playerBurst == False and dealerBurst == False:
         if playerPoint > dealerPoint:
-            print("結果:プレイヤの勝利!!")
+            print("結果:プレイヤーの勝利!!")
             motikin += kakekin
         else:
-            print("結果:プレイヤの敗北")
+            print("結果:プレイヤーの敗北")
             motikin -= kakekin
     elif playerBurst == False and dealerBurst == True:
-        print("結果:プレイヤの勝利!!")
+        print("結果:プレイヤーの勝利!!")
         motikin += kakekin
     elif playerBurst == True and dealerBurst == False:
-        print("結果:プレイヤの敗北")
+        print("結果:プレイヤーの敗北")
         motikin -= kakekin
     
     print("-" * SEPARATOR_NUM)
@@ -164,7 +166,7 @@ def print_result():
     print(f"手札：{dealerCard}")
     print(f"得点：{dealerPoint}")
     print("-" * SEPARATOR_NUM)
-    print("プレイヤ")
+    print("プレイヤー")
     print(f"手札：{playerCard}")
     print(f"得点：{playerPoint}")
     print("-" * SEPARATOR_NUM)
